@@ -1,9 +1,167 @@
 import UIKit
 
+private struct QuizQuestion {
+    // строка с названием фильма,
+    // совпадает с названием картинки афиши фильма в Assets
+    let image: String
+    // строка с вопросом о рейтинге фильма
+    let text: String
+    let correctAnswer: Bool
+}
+
+// вью модель для состояния "Вопрос показан"
+private struct QuizStepViewModel {
+    // картинка с афишей фильма с типом UIImage
+    let image: UIImage
+    // вопрос о рейтинге квиза
+    let question: String
+    // строка с порядковым номером этого вопроса (ex. "1/10")
+    let questionNumber: String
+}
+
+// для состояния "Результат квиза"
+private struct QuizResultsViewModel {
+    let title: String
+    let text: String
+    let buttonText: String
+}
+
 final class MovieQuizViewController: UIViewController {
+    
+    // MARK: - Properties
+    private var currentQuestionIndex = 0
+    private var correctAnswers = 0
+    
+    // StatusBar text color
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    // mock data
+    private let questions: [QuizQuestion] = [
+        QuizQuestion(image: "The Godfather",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: true),
+        QuizQuestion(image: "The Dark Knight",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: true),
+        QuizQuestion(image: "Kill Bill",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: true),
+        QuizQuestion(image: "The Avengers",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: true),
+        QuizQuestion(image: "Deadpool",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: true),
+        QuizQuestion(image: "The Green Knight",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: true),
+        QuizQuestion(image: "Old",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: false),
+        QuizQuestion(image: "The Ice Age Adventures of Buck Wild",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: false),
+        QuizQuestion(image: "Tesla",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: false),
+        QuizQuestion(image: "Vivarium",
+                     text: "Рейтинг этого фильма больше чем 6?",
+                     correctAnswer: false)
+    ]
+    // MARK: - IBOutlets
+    @IBOutlet
+    private var imageView: UIImageView!
+    @IBOutlet
+    private var textLabel: UILabel!
+    @IBOutlet
+    private var counterLabel: UILabel!
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        show(quiz: convert(model: questions[currentQuestionIndex]))
+    }
+    
+    // метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
+    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+        let questionStep = QuizStepViewModel(
+            image: UIImage(named: model.image) ?? UIImage(),
+            question: model.text,
+            questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+        return questionStep
+    }
+    
+    // метод вывода на экран вопроса
+    private func show(quiz step: QuizStepViewModel) {
+        imageView.image = step.image
+        textLabel.text = step.question
+        counterLabel.text = step.questionNumber
+    }
+    
+    private func show(quiz result: QuizResultsViewModel) {
+        let alert = UIAlertController(title: result.title,
+                                      message: result.text,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            // находим нужный моковый вопрос
+            let firstQuestion = self.questions[self.currentQuestionIndex]
+            // конвертируем его во вью модель
+            let viewModel = self.convert(model: firstQuestion)
+            // отображаем данные из вью модели на экране
+            self.show(quiz: viewModel)
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
+    // метод, который меняет цвет рамки
+    private func showAnswerResult(isCorrect: Bool) {
+        imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
+        imageView.layer.borderWidth = 8
+        imageView.layer.cornerRadius = 20
+        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        correctAnswers += isCorrect ? 1 : 0
+        // запускаем задачу через 1 секунду
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.showNextQuestionOrResults()
+            self.imageView.layer.borderWidth = 0
+        }
+    }
+    
+    // метод, который содержит логику перехода в один из сценариев
+    private func showNextQuestionOrResults() {
+        if currentQuestionIndex == questions.count - 1 {
+            // идём в состояние "Результат квиза"
+            let viewModel = QuizResultsViewModel(
+                title: "Этот раунд окончен!",
+                text: "Ваш результат: \(correctAnswers)/\(questions.count)",
+                buttonText: "Сыграть еще раз")
+            show(quiz: viewModel)
+        } else {
+            currentQuestionIndex += 1
+            // идём в состояние "Вопрос показан"
+            let nextQuestion = questions[currentQuestionIndex]
+            let viewModel = convert(model: nextQuestion)
+            show(quiz: viewModel)
+        }
+    }
+    
+    @IBAction
+    private func yesButtonClicked(_ sender: UIButton) {
+        let currentQuestion = questions[currentQuestionIndex]
+        let givenAnswer = true
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    @IBAction
+    private func noButtonClicked(_ sender: UIButton) {
+        let currentQuestion = questions[currentQuestionIndex]
+        let givenAnswer = false
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
 }
 
@@ -69,4 +227,4 @@ final class MovieQuizViewController: UIViewController {
  Настоящий рейтинг: 5,8
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: НЕТ
-*/
+ */
