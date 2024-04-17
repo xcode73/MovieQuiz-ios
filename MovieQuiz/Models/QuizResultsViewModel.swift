@@ -7,7 +7,7 @@
 
 import Foundation
 
-// для состояния "Результат квиза"
+/// вью модель для состояния "Результат квиза"
 struct QuizResultsViewModel {
     let title: String
     let text: String

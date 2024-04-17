@@ -1,62 +1,5 @@
 import UIKit
 
-private struct QuizQuestion {
-    /// строка с названием фильма, совпадает с названием картинки афиши фильма в Assets
-    let image: String
-    /// строка с вопросом о рейтинге фильма
-    let text: String
-    let correctAnswer: Bool
-}
-
-/// вью модель для состояния "Вопрос показан"
-private struct QuizStepViewModel {
-    let image: UIImage
-    let question: String
-    let questionNumber: String
-}
-
-/// вью модель для состояния "Результат квиза"
-private struct QuizResultsViewModel {
-    let title: String
-    let text: String
-    let buttonText: String
-}
-
-private struct Questions {
-    static let questions: [QuizQuestion] = [
-        QuizQuestion(image: "The Godfather",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: true),
-        QuizQuestion(image: "The Dark Knight",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: true),
-        QuizQuestion(image: "Kill Bill",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: true),
-        QuizQuestion(image: "The Avengers",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: true),
-        QuizQuestion(image: "Deadpool",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: true),
-        QuizQuestion(image: "The Green Knight",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: true),
-        QuizQuestion(image: "Old",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: false),
-        QuizQuestion(image: "The Ice Age Adventures of Buck Wild",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: false),
-        QuizQuestion(image: "Tesla",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: false),
-        QuizQuestion(image: "Vivarium",
-                     text: "Рейтинг этого фильма больше чем 6?",
-                     correctAnswer: false)
-    ]
-}
-
 final class MovieQuizViewController: UIViewController {
     
     // MARK: - Properties
@@ -70,8 +13,6 @@ final class MovieQuizViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
-    private let questions = Questions.questions
     
     // MARK: - IBOutlets
     @IBOutlet
@@ -112,7 +53,8 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
     }
     
-    // метод, который меняет цвет рамки
+    /// метод, который меняет цвет рамки в зависемости от ответа
+    /// - Parameter isCorrect: принимает булевое значение
     private func showAnswerResult(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
@@ -130,7 +72,6 @@ final class MovieQuizViewController: UIViewController {
     /// метод, который содержит логику перехода в один из сценариев
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
-            // идём в состояние "Результат квиза"
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
@@ -138,7 +79,6 @@ final class MovieQuizViewController: UIViewController {
             showResultAlert(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
-            // идём в состояние "Вопрос показан"
             if let nextQuestion = questionFactory.requestNextQuestion() {
                 currentQuestion = nextQuestion
                 let viewModel = convert(model: nextQuestion)
@@ -166,7 +106,8 @@ final class MovieQuizViewController: UIViewController {
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    // метод вывода на экран результата
+    /// Метод вывода на экран алерты с результатом и рестартом квиза
+    /// - Parameter result: модель результата
     private func showResultAlert(quiz result: QuizResultsViewModel) {
         let alert = UIAlertController(title: result.title,
                                       message: result.text,
