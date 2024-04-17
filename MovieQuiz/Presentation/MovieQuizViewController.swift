@@ -3,6 +3,7 @@ import UIKit
 final class MovieQuizViewController: UIViewController {
     
     // MARK: - Properties
+    
     private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
     private let questionsAmount: Int = 0
@@ -15,6 +16,7 @@ final class MovieQuizViewController: UIViewController {
     }
     
     // MARK: - IBOutlets
+    
     @IBOutlet
     private var imageView: UIImageView!
     
@@ -25,6 +27,7 @@ final class MovieQuizViewController: UIViewController {
     private var counterLabel: UILabel!
     
     // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         if let firstQuestion = questionFactory.requestNextQuestion() {
@@ -34,8 +37,10 @@ final class MovieQuizViewController: UIViewController {
         }
     }
     
+    //MARK: - Methods
+    
     /// метод конвертации
-    /// - Parameter model: принимает моковый вопрос
+    /// - Parameter model: модель вопроса
     /// - Returns: вью модель для экрана вопроса
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
@@ -61,7 +66,6 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.cornerRadius = 20
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         correctAnswers += isCorrect ? 1 : 0
-        // запускаем задачу через 1 секунду
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.showNextQuestionOrResults()
@@ -82,28 +86,9 @@ final class MovieQuizViewController: UIViewController {
             if let nextQuestion = questionFactory.requestNextQuestion() {
                 currentQuestion = nextQuestion
                 let viewModel = convert(model: nextQuestion)
-                
                 show(quiz: viewModel)
             }
         }
-    }
-    
-    @IBAction
-    private func yesButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        let givenAnswer = true
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-    }
-    
-    @IBAction
-    private func noButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        let givenAnswer = false
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     /// Метод вывода на экран алерты с результатом и рестартом квиза
@@ -125,5 +110,25 @@ final class MovieQuizViewController: UIViewController {
         }
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
+    }
+    
+    //MARK: - IBActions
+    
+    @IBAction
+    private func yesButtonClicked(_ sender: UIButton) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        let givenAnswer = true
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    @IBAction
+    private func noButtonClicked(_ sender: UIButton) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        let givenAnswer = false
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
 }
