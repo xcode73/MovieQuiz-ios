@@ -26,19 +26,8 @@ private struct QuizResultsViewModel {
     let buttonText: String
 }
 
-final class MovieQuizViewController: UIViewController {
-    
-    // MARK: - Properties
-    private var currentQuestionIndex = 0
-    private var correctAnswers = 0
-    
-    // StatusBar text color
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
-    // mock data
-    private let questions: [QuizQuestion] = [
+private struct Questions {
+    static let questions: [QuizQuestion] = [
         QuizQuestion(image: "The Godfather",
                      text: "Рейтинг этого фильма больше чем 6?",
                      correctAnswer: true),
@@ -70,6 +59,21 @@ final class MovieQuizViewController: UIViewController {
                      text: "Рейтинг этого фильма больше чем 6?",
                      correctAnswer: false)
     ]
+}
+
+final class MovieQuizViewController: UIViewController {
+    
+    // MARK: - Properties
+    private var currentQuestionIndex = 0
+    private var correctAnswers = 0
+    
+    // StatusBar text color
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    private let questions = Questions.questions
+    
     // MARK: - IBOutlets
     @IBOutlet
     private var imageView: UIImageView!
