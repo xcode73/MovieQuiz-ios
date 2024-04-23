@@ -1,14 +1,23 @@
+//
+//  MovieQuizViewController.swift
+//  MovieQuiz
+//
+//  Created by Nikolai Eremenko on 18.04.2024.
+//
+
 import UIKit
 
+/// Вью контроллер для квиза
 final class MovieQuizViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var currentQuestionIndex: Int = 0
-    private var correctAnswers: Int = 0
-    private let questionsAmount: Int = 0
-    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    var currentQuestionIndex: Int = 0
+    var correctAnswers: Int = 0
+    var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var alertPresenter: AlertPresenterProtocol = AlertPresenter()
     private var currentQuestion: QuizQuestion?
+    private let questionsAmount: Int = 10
     
     /// StatusBar text color
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -34,8 +43,11 @@ final class MovieQuizViewController: UIViewController {
         let questionFactory = QuestionFactory()
         questionFactory.delegate = self
         self.questionFactory = questionFactory
-        
         questionFactory.requestNextQuestion()
+        
+        let alertPresenter = AlertPresenter()
+        alertPresenter.delegate = self
+        self.alertPresenter = alertPresenter
     }
     
     //MARK: - Methods
@@ -51,15 +63,15 @@ final class MovieQuizViewController: UIViewController {
         return questionStep
     }
     
-    /// метод вывода на экран вопроса
-    /// - Parameter step: модель вопроса, которую нужно вывести на экран
+    /// метод, который выводит вопрос
+    /// - Parameter step: вью модель для экрана вопроса
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
     
-    /// метод, который меняет цвет рамки в зависемости от ответа
+    /// метод, который меняет цвет и размер рамки в зависимости от ответа
     /// - Parameter isCorrect: принимает булевое значение
     private func showAnswerResult(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
@@ -74,36 +86,23 @@ final class MovieQuizViewController: UIViewController {
         }
     }
     
-    /// метод, который содержит логику перехода в один из сценариев
+    /// метод, который содержит логику перехода в один из сценариев: квиз окончен - результат; следующий вопрос.
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
-            let viewModel = QuizResultsViewModel(
+            let text = correctAnswers == questionsAmount ?
+                        "Поздравляем, вы ответили на 10 из \(questionsAmount)!":
+                        "Вы ответили на \(correctAnswers) из \(questionsAmount), попробуйте еще раз!"
+            
+            let resultModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
-                text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
+                text: text,
                 buttonText: "Сыграть еще раз")
-            showResultAlert(quiz: viewModel)
+            
+            alertPresenter.resultAlert(model: resultModel)
         } else {
             currentQuestionIndex += 1
-            
             questionFactory.requestNextQuestion()
         }
-    }
-    
-    /// Метод вывода на экран алерты с результатом и рестартом квиза
-    /// - Parameter result: модель результата
-    private func showResultAlert(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(title: result.title,
-                                      message: result.text,
-                                      preferredStyle: .alert)
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            
-            self.questionFactory.requestNextQuestion()
-        }
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
     }
     
     //MARK: - IBActions
@@ -128,6 +127,7 @@ final class MovieQuizViewController: UIViewController {
 }
 
 // MARK: - QuestionFactoryDelegate
+
 extension MovieQuizViewController: QuestionFactoryDelegate {
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
@@ -139,6 +139,30 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
         
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
+        }
+    }
+}
+
+// MARK: - AlertPresenterDelegate
+
+extension MovieQuizViewController: AlertPresenterDelegate {
+    func showResultAlert(model: AlertModel?) {
+        guard let model = model else {
+            return
+        }
+        
+        let alert = UIAlertController(title: model.title,
+                                      message: model.message,
+                                      preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
+            model.completion()
+        }
+        
+        alert.addAction(action)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.present(alert, animated: true)
         }
     }
 }

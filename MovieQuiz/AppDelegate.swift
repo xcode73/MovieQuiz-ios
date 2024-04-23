@@ -1,3 +1,10 @@
+//
+//  AppDelegate.swift
+//  MovieQuiz
+//
+//  Created by Nikolai Eremenko on 18.04.2024.
+//
+
 import UIKit
 
 @main
@@ -6,7 +13,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        // sleep(3) // Simulate launch
         return true
     }
 

@@ -45,6 +45,8 @@ class QuestionFactory {
     ]
 }
 
+// MARK: - QuestionFactoryProtocol
+
 extension QuestionFactory: QuestionFactoryProtocol {
     func requestNextQuestion() {
         guard let index = (0..<questions.count).randomElement() else {
@@ -57,8 +59,9 @@ extension QuestionFactory: QuestionFactoryProtocol {
     }
 }
 
+
+// MARK: - Mock Data
 /*
- Mock-данные
  
  Картинка: The Godfather
  Настоящий рейтинг: 9,2
