@@ -7,32 +7,25 @@
 
 import UIKit
 
-/// Алерт презентер
-final class AlertPresenter {
-    weak var delegate: AlertPresenterDelegate?
-}
-
-// MARK: - AlertPresenterProtocol
-extension AlertPresenter: AlertPresenterProtocol {
-
-    func resultAlert(model: QuizResultsViewModel) {
+struct AlertPresenter {
+    private static func resultAlert(on vc: UIViewController, title: String, message: String, buttonText: String, completion: @escaping () -> Void) {
         
-        guard let delegate = delegate else {
-            return
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: buttonText, style: .default) { _ in
+            completion()
         }
-        
-        let alertModel = AlertModel(
+        alert.addAction(action)
+        vc.present(alert, animated: true)
+    }
+    
+    static func showResultAlert(on vc: UIViewController, with model: AlertModel?) {
+        guard let model = model else { return }
+        resultAlert(on: vc,
                     title: model.title,
-                    message: model.text,
+                    message: model.message,
                     buttonText: model.buttonText,
-                    completion: { [weak delegate] in
-                        guard let vc = delegate as? MovieQuizViewController else { return }
-                        vc.currentQuestionIndex = 0
-                        vc.correctAnswers = 0
-                        vc.questionFactory.requestNextQuestion()
-                    }
-                )
-        
-        delegate.showResultAlert(model: alertModel)
+                    completion: model.completion)
     }
 }

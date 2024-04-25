@@ -7,15 +7,16 @@
 
 import UIKit
 
-/// Вью контроллер для квиза
 final class MovieQuizViewController: UIViewController {
     
     // MARK: - Properties
     
+    var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var statisticService: StatisticServiceProtocol?
+    
     var currentQuestionIndex: Int = 0
     var correctAnswers: Int = 0
-    var questionFactory: QuestionFactoryProtocol = QuestionFactory()
-    private var alertPresenter: AlertPresenterProtocol = AlertPresenter()
+
     private var currentQuestion: QuizQuestion?
     private let questionsAmount: Int = 10
     
@@ -44,10 +45,6 @@ final class MovieQuizViewController: UIViewController {
         questionFactory.delegate = self
         self.questionFactory = questionFactory
         questionFactory.requestNextQuestion()
-        
-        let alertPresenter = AlertPresenter()
-        alertPresenter.delegate = self
-        self.alertPresenter = alertPresenter
     }
     
     //MARK: - Methods
@@ -59,7 +56,7 @@ final class MovieQuizViewController: UIViewController {
         let questionStep = QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/10")
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
     }
     
@@ -86,19 +83,42 @@ final class MovieQuizViewController: UIViewController {
         }
     }
     
-    /// метод, который содержит логику перехода в один из сценариев: квиз окончен - результат; следующий вопрос.
+    //MARK: - showNextQuestionOrResults
+    
+    /// Логика перехода в один из сценариев: квиз окончен - алерта-результат; следующий вопрос.
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
-            let text = correctAnswers == questionsAmount ?
-                        "Поздравляем, вы ответили на 10 из \(questionsAmount)!":
-                        "Вы ответили на \(correctAnswers) из \(questionsAmount), попробуйте еще раз!"
+            
+            statisticService = StatisticService()
+            guard let statisticService = statisticService else { return }
+            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            
+            let text =
+                        """
+                        Ваш результат: \(correctAnswers)/\(questionsAmount)
+                        Количество сыгранных квизов: \(statisticService.gamesCount)
+                        Рекорд: \(statisticService.bestGame.correct)/\(questionsAmount) (\(statisticService.bestGame.date.dateTimeString))
+                        Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+                        """
             
             let resultModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: text,
                 buttonText: "Сыграть еще раз")
             
-            alertPresenter.resultAlert(model: resultModel)
+            let alertModel = AlertModel(
+                title: resultModel.title,
+                message: resultModel.text,
+                buttonText: resultModel.buttonText,
+                completion: { [weak self] in
+                    guard let self = self else { return }
+                    self.currentQuestionIndex = 0
+                    self.correctAnswers = 0
+                    self.questionFactory.requestNextQuestion()
+                }
+            )
+            
+            AlertPresenter.showResultAlert(on: self, with: alertModel)
         } else {
             currentQuestionIndex += 1
             questionFactory.requestNextQuestion()
@@ -139,30 +159,6 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
         
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
-        }
-    }
-}
-
-// MARK: - AlertPresenterDelegate
-
-extension MovieQuizViewController: AlertPresenterDelegate {
-    func showResultAlert(model: AlertModel?) {
-        guard let model = model else {
-            return
-        }
-        
-        let alert = UIAlertController(title: model.title,
-                                      message: model.message,
-                                      preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
-            model.completion()
-        }
-        
-        alert.addAction(action)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.present(alert, animated: true)
         }
     }
 }
