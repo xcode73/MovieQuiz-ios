@@ -9,6 +9,8 @@ import Foundation
 
 final class StatisticService {
     private let userDefaults = UserDefaults.standard
+    private lazy var totalCorrectAnswers: Double = 0
+    private lazy var totalQuestions: Double = 0
     
     private enum Keys: String {
         case correct, total, bestGame, gamesCount
@@ -33,7 +35,7 @@ extension StatisticService: StatisticServiceProtocol {
         get {
             guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),
                 let record = try? JSONDecoder().decode(GameRecord.self, from: data) else {
-                return .init(correct: 0, total: 0, date: Date())
+                return GameRecord(correct: 0, total: 0, date: Date())
             }
             return record
         }
@@ -57,18 +59,24 @@ extension StatisticService: StatisticServiceProtocol {
         }
     }
     
-    /// Сохранение лучшего результата — с проверкой на то, что новый результат лучше сохранённого в UserDefaults
+    /// Сохранение лучшего результата и средней точности в UserDefaults
     /// - Parameters:
     ///   - count: Количество верных ответов
     ///   - amount: Количество вопросов
+    ///
+    ///  Средняя точность в процентах, 
+    ///  рассчитывающаяся как отношение правильно отвеченных вопросов за все игры
+    ///  к общему количеству вопросов за все игры
     func store(correct count: Int, total amount: Int) {
-        let record = GameRecord(correct: count, total: amount, date: Date())
+        let currentGame = GameRecord(correct: count, total: amount, date: Date())
         
-        if record.compare(with: bestGame) {
-            bestGame = record
+        if currentGame.compare(with: bestGame) {
+            bestGame = currentGame
         }
         
-        totalAccuracy = Double(count) / Double(amount) * 100
         gamesCount += 1
+        totalCorrectAnswers += Double(count)
+        totalQuestions += Double(amount)
+        totalAccuracy = totalCorrectAnswers / totalQuestions * 100
     }
 }
