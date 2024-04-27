@@ -20,7 +20,7 @@ struct AlertPresenter {
         vc.present(alert, animated: true)
     }
     
-    static func showResultAlert(on vc: UIViewController, with model: AlertModel?) {
+    static func resultAlert(on vc: UIViewController, with model: AlertModel?) {
         guard let model = model else { return }
         resultAlert(on: vc,
                     title: model.title,
