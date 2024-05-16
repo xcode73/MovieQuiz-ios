@@ -1,3 +1,10 @@
+//
+//  SceneDelegate.swift
+//  MovieQuiz
+//
+//  Created by Nikolai Eremenko on 18.04.2024.
+//
+
 import UIKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
