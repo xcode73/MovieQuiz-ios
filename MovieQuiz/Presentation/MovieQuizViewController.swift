@@ -207,12 +207,12 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
 
 
 // MARK: - Alerts
-extension MovieQuizViewController {
+private extension MovieQuizViewController {
     
     /// Вывод результата игры
     ///
     /// Вывод результата игры и статистики всех игр с задержкой в 1 секунду
-    private func showResults() {
+    func showResults() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
             guard let self = self else { return }
             AlertPresenter.resultAlert(on: self, with: convertResultToAlert(model: createResults()))
@@ -221,28 +221,28 @@ extension MovieQuizViewController {
     
     /// Вывод сообщения о проблемах с сетью
     /// - Parameter message: Описание ошибки
-    private func showNetworkError(message: String) {
+    func showNetworkError(message: String) {
         AlertPresenter.networkErrorAlert(on: self, with: message, completion: { [weak self] in
             self?.restartQuiz()
         })
     }
     
     /// Вывод сообщения о проблемах с сетью
-    private func showQuestionsAlert() {
+    func showQuestionsAlert() {
         AlertPresenter.showQuestionNetworkError(on: self, completion: { [weak self] in
             self?.questionFactory?.requestNextQuestion()
         })
     }
     
     /// Вывод сообщения об изменении темы
-    private func showThemeAlert() {
+    func showThemeAlert() {
         AlertPresenter.themeAlert(on: self, completion: { [weak self] in
             self?.systemTheme()
         })
     }
     
     /// Создание результата игры
-    private func createResults() -> QuizResultsViewModel {
+    func createResults() -> QuizResultsViewModel {
         statisticService.store(correct: correctAnswers, total: questionsAmount)
         
         let text =
@@ -264,7 +264,7 @@ extension MovieQuizViewController {
     /// Конвертация QuizResultsViewModel в AlertModel
     /// - Parameter model: Вью модель результата квиза
     /// - Returns: Модель алерты
-    private func convertResultToAlert(model: QuizResultsViewModel) -> AlertModel {
+    func convertResultToAlert(model: QuizResultsViewModel) -> AlertModel {
         let alertModel = AlertModel(
             title: model.title,
             message: model.text,
