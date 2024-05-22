@@ -61,4 +61,12 @@ struct AlertPresenter {
                        buttons: ["Да", "Нет"],
                        completion: completion)
     }
+    
+    static func showQuestionNetworkError(on vc: UIViewController, completion: @escaping () -> Void) {
+        showBasicAlert(on: vc,
+                       title: "Ошибка",
+                       message: "Не удалось загрузить вопрос! \n Проверьте подключение к сети",
+                       buttons: ["Попробовать снова"],
+                       completion: completion)
+    }
 }

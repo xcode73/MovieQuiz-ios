@@ -82,9 +82,9 @@ extension QuestionFactory: QuestionFactoryProtocol {
             var imageData = Data()
             
             do {
-                imageData = try Data(contentsOf: movie.imageURL)
+                imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                print("Failed to load image")
+                self.delegate?.didFailToReceiveNextQuestion()
             }
 
             func roundedRating(rating: Float) -> Float {
@@ -93,18 +93,10 @@ extension QuestionFactory: QuestionFactoryProtocol {
             
             let rating = roundedRating(rating: Float(movie.rating) ?? 0)
             let questionRating = roundedRating(rating: Float.random(in: 8.1...8.9))
-            let questionType = ["больше", "меньше"].randomElement() ?? "равен"
-            let text = "Рейтинг этого фильма \(questionType) чем \(questionRating)?"
-            let correctAnswer: Bool
+            let questionType = Bool.random()
+            let text = "Рейтинг этого фильма \(questionType ? "больше" : "меньше") чем \(questionRating)?"
+            let correctAnswer = questionType ? (rating > questionRating) : (rating < questionRating)
             
-            switch questionType {
-                case "меньше":
-                    correctAnswer = rating > questionRating
-                case "больше":
-                    correctAnswer = rating < questionRating
-                default:
-                    correctAnswer = rating == questionRating
-            }
             
             let question = QuizQuestion(image: imageData,
                                         text: text,

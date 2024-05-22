@@ -179,7 +179,7 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
         questionFactory?.requestNextQuestion()
     }
     
-    /// Cообщение об ошибке загрузки
+    /// Cообщение об ошибке загрузки игры
     /// - Parameter error: Описание ошибки
     func didFailToLoadData(with error: any Error) {
         hideSpinner()
@@ -197,6 +197,11 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.showQuestion(quiz: viewModel)
         }
+    }
+    
+    func didFailToReceiveNextQuestion() {
+        hideSpinner()
+        showQuestionsAlert()
     }
 }
 
@@ -219,6 +224,13 @@ extension MovieQuizViewController {
     private func showNetworkError(message: String) {
         AlertPresenter.networkErrorAlert(on: self, with: message, completion: { [weak self] in
             self?.restartQuiz()
+        })
+    }
+    
+    /// Вывод сообщения о проблемах с сетью
+    private func showQuestionsAlert() {
+        AlertPresenter.showQuestionNetworkError(on: self, completion: { [weak self] in
+            self?.questionFactory?.requestNextQuestion()
         })
     }
     
