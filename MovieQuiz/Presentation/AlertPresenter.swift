@@ -15,6 +15,7 @@ struct AlertPresenter {
                        title: model.title,
                        message: model.message,
                        buttons: [model.buttonText],
+                       identifier: "Game results",
                        completion: model.completion)
     }
     
@@ -22,7 +23,8 @@ struct AlertPresenter {
         showBasicAlert(on: vc,
                        title: "Ошибка",
                        message: message,
-                       buttons: ["Попробовать еще раз"],
+                       buttons: ["Попробовать снова"],
+                       identifier: "Network error",
                        completion: completion)
     }
     
@@ -31,6 +33,7 @@ struct AlertPresenter {
                        title: "Выбор темы",
                        message: "Приложение рассчитано на использование темной темы. Изменить на системную?",
                        buttons: ["Да", "Нет"],
+                       identifier: "Theme alert",
                        completion: completion)
     }
     
@@ -39,14 +42,22 @@ struct AlertPresenter {
                        title: "Ошибка",
                        message: "Не удалось загрузить вопрос! \n Проверьте подключение к сети",
                        buttons: ["Попробовать снова"],
+                       identifier: "Question Error",
                        completion: completion)
     }
     
-    private static func showBasicAlert(on vc: UIViewController, title: String, message: String, buttons: [String], completion: @escaping () -> ()) {
+    private static func showBasicAlert(on vc: UIViewController, 
+                                       title: String,
+                                       message: String,
+                                       buttons: [String],
+                                       identifier: String,
+                                       completion: @escaping () -> ()) {
         
         let alert = UIAlertController(title: title,
                                       message: message,
                                       preferredStyle: .alert)
+        
+        alert.view.accessibilityIdentifier = identifier
         
         for button in buttons {
             switch button {

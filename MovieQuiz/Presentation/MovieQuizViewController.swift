@@ -85,7 +85,6 @@ final class MovieQuizViewController: UIViewController {
     /// Вывод следующего вопроса или результата квиза
     /// - Parameter answer: Нажата кнопка: Да - true; Нет - false.
     private func buttonAction(with givenAnswer: Bool) {
-//        showSpinner()
         storeAnswer(with: givenAnswer)
         showAnswer(with: givenAnswer)
         
@@ -256,7 +255,7 @@ private extension MovieQuizViewController {
         let viewModel = QuizResultsViewModel(
             title: "Этот раунд окончен!",
             text: text,
-            buttonText: "Сыграть еще раз")
+            buttonText: "Сыграть ещё раз")
         
         return viewModel
     }
