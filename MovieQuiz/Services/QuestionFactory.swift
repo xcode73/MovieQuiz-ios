@@ -84,7 +84,9 @@ extension QuestionFactory: QuestionFactoryProtocol {
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                self.delegate?.didFailToReceiveNextQuestion()
+                DispatchQueue.main.async {
+                    self.delegate?.didFailToReceiveNextQuestion()
+                }
             }
 
             func roundedRating(rating: Float) -> Float {
@@ -102,8 +104,8 @@ extension QuestionFactory: QuestionFactoryProtocol {
                                         text: text,
                                         correctAnswer: correctAnswer)
             
-            DispatchQueue.main.async { [weak self] in
-                self?.delegate?.didReceiveNextQuestion(question: question)
+            DispatchQueue.main.async {
+                self.delegate?.didReceiveNextQuestion(question: question)
             }
         }
     }

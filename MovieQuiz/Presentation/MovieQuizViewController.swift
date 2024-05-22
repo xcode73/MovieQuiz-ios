@@ -50,7 +50,6 @@ final class MovieQuizViewController: UIViewController {
         
         showSpinner()
         loadQuiz()
-        imageView.contentMode = .scaleAspectFill
     }
     
     //MARK: - Private methods
