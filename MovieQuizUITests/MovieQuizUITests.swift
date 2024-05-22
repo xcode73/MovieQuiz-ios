@@ -38,12 +38,21 @@ final class MovieQuizUITests: XCTestCase {
 //        // Use XCTAssert and related functions to verify your tests produce the correct results.
 //    }
     
-    func testScreenCast() throws {
+    func testYesButton() {
+        sleep(3)
+        let firstPoster = app.images["Poster"] // находим первоначальный постер
+        let firstPosterData = firstPoster.screenshot().pngRepresentation
         
-        let app = XCUIApplication()
-        app/*@START_MENU_TOKEN@*/.staticTexts["Нет"]/*[[".buttons[\"Нет\"].staticTexts[\"Нет\"]",".staticTexts[\"Нет\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        app.buttons["Да"].tap()
-                        
+        sleep(3)
+        app.buttons["Yes"].tap()
+        
+        let secondPoster = app.images["Poster"] // ещё раз находим постер
+        let secondPosterData = secondPoster.screenshot().pngRepresentation
+        
+//        XCTAssertFalse(firstPoster == secondPoster) // проверяем, что постеры разные
+//        XCTAssertTrue(firstPoster.exists)
+        
+        XCTAssertNotEqual(firstPosterData, secondPosterData)
     }
 
 }
