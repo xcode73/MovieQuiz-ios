@@ -8,34 +8,6 @@
 import UIKit
 
 struct AlertPresenter {
-    private static func showBasicAlert(on vc: UIViewController, title: String, message: String, buttons: [String], completion: @escaping () -> ()) {
-        
-        let alert = UIAlertController(title: title,
-                                      message: message,
-                                      preferredStyle: .alert)
-        
-        for button in buttons {
-            switch button {
-            case "Да":
-                let systemThemeAction = UIAlertAction(title: button, style: .default) { _ in
-                    completion()
-                }
-                alert.addAction(systemThemeAction)
-            case "Нет":
-                let defaultThemeAction = UIAlertAction(title: button, style: .cancel)
-                alert.addAction(defaultThemeAction)
-            default:
-                let action = UIAlertAction(title: button, style: .default) { _ in
-                    completion()
-                }
-                alert.addAction(action)
-            }
-        }
-        
-        DispatchQueue.main.async {
-            vc.present(alert, animated: true)
-        }
-    }
     
     static func resultAlert(on vc: UIViewController, with model: AlertModel?) {
         guard let model = model else { return }
@@ -68,5 +40,34 @@ struct AlertPresenter {
                        message: "Не удалось загрузить вопрос! \n Проверьте подключение к сети",
                        buttons: ["Попробовать снова"],
                        completion: completion)
+    }
+    
+    private static func showBasicAlert(on vc: UIViewController, title: String, message: String, buttons: [String], completion: @escaping () -> ()) {
+        
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        
+        for button in buttons {
+            switch button {
+            case "Да":
+                let systemThemeAction = UIAlertAction(title: button, style: .default) { _ in
+                    completion()
+                }
+                alert.addAction(systemThemeAction)
+            case "Нет":
+                let defaultThemeAction = UIAlertAction(title: button, style: .cancel)
+                alert.addAction(defaultThemeAction)
+            default:
+                let action = UIAlertAction(title: button, style: .default) { _ in
+                    completion()
+                }
+                alert.addAction(action)
+            }
+        }
+        
+        DispatchQueue.main.async {
+            vc.present(alert, animated: true)
+        }
     }
 }

@@ -77,14 +77,21 @@ extension QuestionFactory: QuestionFactoryProtocol {
             guard let self = self else { return }
             let index = (0..<self.movies.count).randomElement() ?? 0
             
-            guard let movie = self.movies[safe: index] else { return }
+            guard let movie = self.movies[safe: index] else {
+                DispatchQueue.main.async {
+                    self.delegate?.didFailToLoadData(with: NSError())
+                }
+                return
+            }
 
             var imageData = Data()
             
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                self.delegate?.didFailToReceiveNextQuestion()
+                DispatchQueue.main.async {
+                    self.delegate?.didFailToReceiveNextQuestion()
+                }
             }
 
             func roundedRating(rating: Float) -> Float {
@@ -102,8 +109,8 @@ extension QuestionFactory: QuestionFactoryProtocol {
                                         text: text,
                                         correctAnswer: correctAnswer)
             
-            DispatchQueue.main.async { [weak self] in
-                self?.delegate?.didReceiveNextQuestion(question: question)
+            DispatchQueue.main.async {
+                self.delegate?.didReceiveNextQuestion(question: question)
             }
         }
     }
