@@ -25,7 +25,6 @@ extension StatisticService: StatisticServiceProtocol {
         get {
             userDefaults.integer(forKey: Keys.gamesCount.rawValue)
         }
-        
         set {
             userDefaults.set(newValue, forKey: Keys.gamesCount.rawValue)
         }
@@ -39,7 +38,6 @@ extension StatisticService: StatisticServiceProtocol {
             }
             return record
         }
-        
         set {
             guard let data = try? JSONEncoder().encode(newValue) else {
                 print("Невозможно сохранить результат")
@@ -53,7 +51,6 @@ extension StatisticService: StatisticServiceProtocol {
         get {
             userDefaults.double(forKey: Keys.total.rawValue)
         }
-        
         set {
             userDefaults.set(newValue, forKey: Keys.total.rawValue)
         }
