@@ -19,7 +19,6 @@ class QuestionFactory {
     
     private var movies: [MostPopularMovie] = []
     
-    
     /// mock data
     //    private let questions: [QuizQuestion] = [
     //        QuizQuestion(image: "The Godfather",
@@ -58,7 +57,6 @@ class QuestionFactory {
 // MARK: - QuestionFactoryProtocol
 
 extension QuestionFactory: QuestionFactoryProtocol {
-    
     func loadData() {
         moviesLoader.loadMovies { [weak self] result in
             DispatchQueue.main.async {
@@ -95,9 +93,7 @@ extension QuestionFactory: QuestionFactoryProtocol {
             
             let rating = roundedRating(rating: Float(movie.rating) ?? 0)
             let questionRating = roundedRating(rating: Float.random(in: 8.1...8.9))
-            
             let questionType = ["больше", "меньше"].randomElement() ?? "равен"
-            
             let text = "Рейтинг этого фильма \(questionType) чем \(questionRating)?"
             let correctAnswer: Bool
             

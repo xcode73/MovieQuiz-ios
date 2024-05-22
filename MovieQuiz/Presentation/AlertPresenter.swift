@@ -43,7 +43,6 @@ struct AlertPresenter {
                        title: model.title,
                        message: model.message,
                        buttons: [model.buttonText],
-//                       buttonText: model.buttonText,
                        completion: model.completion)
     }
     
@@ -56,7 +55,6 @@ struct AlertPresenter {
     }
     
     static func themeAlert(on vc: UIViewController, completion: @escaping () -> Void) {
-        
         showBasicAlert(on: vc,
                        title: "Выбор темы",
                        message: "Приложение рассчитано на использование темной темы. Изменить на системную?",

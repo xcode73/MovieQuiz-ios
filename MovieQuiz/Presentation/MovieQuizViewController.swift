@@ -9,18 +9,12 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
     
-    // MARK: - Properties
-    
+    // MARK: - Public properties
     var questionFactory: QuestionFactory?
-    private lazy var statisticService: StatisticServiceProtocol = StatisticService()
-    private var currentQuestion: QuizQuestion?
-    private let questionsAmount: Int = 10
-    
     lazy var currentQuestionIndex: Int = 0
     lazy var correctAnswers: Int = 0
     
     // MARK: - IBOutlets
-    
     @IBOutlet
     private var imageView: UIImageView!
     
@@ -39,6 +33,11 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet
     private var activityIndicator: UIActivityIndicatorView!
     
+    // MARK: - Private properties
+    private lazy var statisticService: StatisticServiceProtocol = StatisticService()
+    private var currentQuestion: QuizQuestion?
+    private let questionsAmount: Int = 10
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -54,7 +53,7 @@ final class MovieQuizViewController: UIViewController {
         imageView.contentMode = .scaleAspectFill
     }
     
-    //MARK: - Methods
+    //MARK: - Private methods
     
     /// Загрузка вопрос
     private func loadQuiz() {
@@ -151,6 +150,8 @@ final class MovieQuizViewController: UIViewController {
         view.isUserInteractionEnabled = true
     }
     
+    
+    
     //MARK: - IBActions
     
     @IBAction
@@ -161,6 +162,11 @@ final class MovieQuizViewController: UIViewController {
     @IBAction
     private func noButtonClicked(_ sender: UIButton) {
         buttonAction(with: false)
+    }
+    
+    /// Тема оформления по выбору системы
+    private func systemTheme() {
+        overrideUserInterfaceStyle = .unspecified
     }
 }
 
@@ -192,16 +198,10 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
             self?.showQuestion(quiz: viewModel)
         }
     }
-    
-    /// Тема оформления по выбору системы
-    private func systemTheme() {
-        overrideUserInterfaceStyle = .unspecified
-    }
 }
 
 
 // MARK: - Alerts
-
 extension MovieQuizViewController {
     
     /// Вывод результата игры
