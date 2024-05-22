@@ -48,7 +48,6 @@ final class MovieQuizViewController: UIViewController {
             overrideUserInterfaceStyle = .dark
         }
         
-        showSpinner()
         loadQuiz()
     }
     
@@ -56,6 +55,7 @@ final class MovieQuizViewController: UIViewController {
     
     /// Загрузка вопрос
     private func loadQuiz() {
+        showSpinner()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory?.loadData()
     }
@@ -85,7 +85,7 @@ final class MovieQuizViewController: UIViewController {
     /// Вывод следующего вопроса или результата квиза
     /// - Parameter answer: Нажата кнопка: Да - true; Нет - false.
     private func buttonAction(with givenAnswer: Bool) {
-        showSpinner()
+//        showSpinner()
         storeAnswer(with: givenAnswer)
         showAnswer(with: givenAnswer)
         
@@ -99,6 +99,7 @@ final class MovieQuizViewController: UIViewController {
     
     /// Вывод следующего вопроса с задержкой в 1 секунду
     private func showNextQuestion() {
+        showSpinner()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.questionFactory?.requestNextQuestion()
         }
@@ -222,14 +223,14 @@ private extension MovieQuizViewController {
     /// - Parameter message: Описание ошибки
     func showNetworkError(message: String) {
         AlertPresenter.networkErrorAlert(on: self, with: message, completion: { [weak self] in
-            self?.restartQuiz()
+            self?.loadQuiz()
         })
     }
     
     /// Вывод сообщения о проблемах с сетью
     func showQuestionsAlert() {
         AlertPresenter.showQuestionNetworkError(on: self, completion: { [weak self] in
-            self?.questionFactory?.requestNextQuestion()
+            self?.showNextQuestion()
         })
     }
     
