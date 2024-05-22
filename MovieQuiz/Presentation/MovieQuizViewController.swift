@@ -57,7 +57,7 @@ final class MovieQuizViewController: UIViewController {
     
     /// Загрузка вопрос
     private func loadQuiz() {
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(networkClient: NetworkClient()), delegate: self)
         questionFactory?.loadData()
     }
     
