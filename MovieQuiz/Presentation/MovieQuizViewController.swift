@@ -11,7 +11,7 @@ final class MovieQuizViewController: UIViewController {
     
     // MARK: - Public properties
     var questionFactory: QuestionFactory?
-    lazy var currentQuestionIndex: Int = 0
+//    lazy var currentQuestionIndex: Int = 0
     lazy var correctAnswers: Int = 0
     
     // MARK: - IBOutlets
@@ -36,7 +36,8 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Private properties
     private lazy var statisticService: StatisticServiceProtocol = StatisticService()
     private var currentQuestion: QuizQuestion?
-    private let questionsAmount: Int = 10
+//    private let questionsAmount: Int = 10
+    private let presenter = MovieQuizPresenter()
     
     // MARK: - Lifecycle
     
@@ -63,13 +64,13 @@ final class MovieQuizViewController: UIViewController {
     /// Конвертация модели вопроса во вью модель вопроса
     /// - Parameter model: модель вопроса
     /// - Returns: вью модель для экрана вопроса
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
-    }
+//    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+//        let questionStep = QuizStepViewModel(
+//            image: UIImage(data: model.image) ?? UIImage(),
+//            question: model.text,
+//            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
+//        return questionStep
+//    }
     
     /// Вывод вопроса
     /// - Parameter step: вью модель для экрана вопроса
@@ -88,10 +89,10 @@ final class MovieQuizViewController: UIViewController {
         storeAnswer(with: givenAnswer)
         showAnswer(with: givenAnswer)
         
-        if currentQuestionIndex == questionsAmount - 1 {
+        if presenter.isLastQuestion() {
             showResults()
         } else {
-            currentQuestionIndex += 1
+            presenter.updateQuestionIndex()
             showNextQuestion()
         }
     }
@@ -130,7 +131,7 @@ final class MovieQuizViewController: UIViewController {
     ///
     /// Сброс текущей статистики и запрос нового вопроса
     private func restartQuiz() {
-        currentQuestionIndex = 0
+        presenter.resetQuestionIndex()
         correctAnswers = 0
         showSpinner()
         questionFactory?.requestNextQuestion()
@@ -191,7 +192,7 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
         guard let question = question else { return }
 
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
             self?.showQuestion(quiz: viewModel)
@@ -214,7 +215,11 @@ private extension MovieQuizViewController {
     func showResults() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
             guard let self = self else { return }
-            AlertPresenter.resultAlert(on: self, with: convertResultToAlert(model: createResults()))
+            AlertPresenter.resultAlert(on: self, 
+                                       with: convertResultToAlert(model: createResults()),
+                                       completion: { [weak self] in
+                self?.restartQuiz()
+            })
         }
     }
     
@@ -242,13 +247,13 @@ private extension MovieQuizViewController {
     
     /// Создание результата игры
     func createResults() -> QuizResultsViewModel {
-        statisticService.store(correct: correctAnswers, total: questionsAmount)
+        statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
         
         let text =
                     """
-                    Ваш результат: \(correctAnswers)/\(questionsAmount)
+                    Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)
                     Количество сыгранных квизов: \(statisticService.gamesCount)
-                    Рекорд: \(statisticService.bestGame.correct)/\(questionsAmount) (\(statisticService.bestGame.date.dateTimeString))
+                    Рекорд: \(statisticService.bestGame.correct)/\(presenter.questionsAmount) (\(statisticService.bestGame.date.dateTimeString))
                     Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
                     """
         
@@ -267,10 +272,7 @@ private extension MovieQuizViewController {
         let alertModel = AlertModel(
             title: model.title,
             message: model.text,
-            buttonText: model.buttonText,
-            completion: { [weak self] in
-                self?.restartQuiz()
-            }
+            buttonText: model.buttonText
         )
         return alertModel
     }

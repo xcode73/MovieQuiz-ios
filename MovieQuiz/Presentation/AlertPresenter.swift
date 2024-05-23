@@ -9,14 +9,14 @@ import UIKit
 
 struct AlertPresenter {
     
-    static func resultAlert(on vc: UIViewController, with model: AlertModel?) {
+    static func resultAlert(on vc: UIViewController, with model: AlertModel?, completion: @escaping () -> Void) {
         guard let model = model else { return }
         showBasicAlert(on: vc,
                        title: model.title,
                        message: model.message,
                        buttons: [model.buttonText],
                        identifier: "Game results",
-                       completion: model.completion)
+                       completion: completion)
     }
     
     static func networkErrorAlert(on vc: UIViewController, with message: String, completion: @escaping () -> Void) {

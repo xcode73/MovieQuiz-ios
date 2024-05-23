@@ -12,6 +12,4 @@ struct AlertModel {
     let title: String
     let message: String
     let buttonText: String
-    /// вызывается при нажатии на кнопку
-    let completion: () -> Void
 }
