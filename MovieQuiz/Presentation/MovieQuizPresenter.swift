@@ -8,18 +8,20 @@
 import UIKit
 
 final class MovieQuizPresenter {
-    
-    let questionsAmount: Int = 10
-    
     var currentQuestion: QuizQuestion?
-    var correctAnswers: Int = 0
     
+    private let statisticService: StatisticServiceProtocol
     private var questionFactory: QuestionFactoryProtocol?
     private weak var viewController: MovieQuizViewController?
+    
+    private let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
+    private var correctAnswers: Int = 0
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
+        
+        self.statisticService = StatisticService()
         
         loadQuiz()
     }
@@ -82,16 +84,48 @@ final class MovieQuizPresenter {
             viewController?.showResults()
         } else {
             updateQuestionIndex()
-            showNextQuestion()
+            proceedToNextQuestion()
         }
     }
     
     /// Вывод следующего вопроса с задержкой в 1 секунду
-    func showNextQuestion() {
+    func proceedToNextQuestion() {
         viewController?.showSpinner()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.questionFactory?.requestNextQuestion()
         }
+    }
+    
+    /// Создание результата игры
+    func createResults() -> QuizResultsViewModel {
+        statisticService.store(correct: correctAnswers, total: questionsAmount)
+        
+        let text =
+                    """
+                    Ваш результат: \(correctAnswers)/\(questionsAmount)
+                    Количество сыгранных квизов: \(statisticService.gamesCount)
+                    Рекорд: \(statisticService.bestGame.correct)/\(questionsAmount) (\(statisticService.bestGame.date.dateTimeString))
+                    Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+                    """
+        
+        let viewModel = QuizResultsViewModel(
+            title: "Этот раунд окончен!",
+            text: text,
+            buttonText: "Сыграть ещё раз")
+        
+        return viewModel
+    }
+    
+    /// Конвертация QuizResultsViewModel в AlertModel
+    /// - Parameter model: Вью модель результата квиза
+    /// - Returns: Модель алерты
+    func convertResultToAlert(model: QuizResultsViewModel) -> AlertModel {
+        let alertModel = AlertModel(
+            title: model.title,
+            message: model.text,
+            buttonText: model.buttonText
+        )
+        return alertModel
     }
 }
 

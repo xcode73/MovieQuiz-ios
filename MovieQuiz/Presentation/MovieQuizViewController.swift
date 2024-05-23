@@ -29,12 +29,9 @@ final class MovieQuizViewController: UIViewController {
     private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Private properties
-    private lazy var statisticService: StatisticServiceProtocol = StatisticService()
-    
     private var presenter: MovieQuizPresenter!
     
     // MARK: - Lifecycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -95,6 +92,11 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderColor = UIColor.clear.cgColor
     }
     
+    /// Тема оформления по выбору системы
+    private func systemTheme() {
+        overrideUserInterfaceStyle = .unspecified
+    }
+    
     //MARK: - IBActions
     
     @IBAction
@@ -105,11 +107,6 @@ final class MovieQuizViewController: UIViewController {
     @IBAction
     private func noButtonClicked(_ sender: UIButton) {
         presenter.buttonAction(with: false)
-    }
-    
-    /// Тема оформления по выбору системы
-    private func systemTheme() {
-        overrideUserInterfaceStyle = .unspecified
     }
 }
 
@@ -122,9 +119,9 @@ extension MovieQuizViewController {
     func showResults() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
             guard let self = self else { return }
-            AlertPresenter.resultAlert(on: self, 
-                                       with: convertResultToAlert(model: createResults()),
-                                       completion: { [weak self] in
+            let result = presenter.createResults()
+            let model = presenter.convertResultToAlert(model: result)
+            AlertPresenter.resultAlert(on: self, with: model, completion: { [weak self] in
                 self?.presenter.restartQuiz()
             })
         }
@@ -141,7 +138,7 @@ extension MovieQuizViewController {
     /// Вывод сообщения о проблемах с сетью
     func showQuestionsAlert() {
         AlertPresenter.showQuestionNetworkError(on: self, completion: { [weak self] in
-            self?.presenter.showNextQuestion()
+            self?.presenter.proceedToNextQuestion()
         })
     }
     
@@ -150,37 +147,5 @@ extension MovieQuizViewController {
         AlertPresenter.themeAlert(on: self, completion: { [weak self] in
             self?.systemTheme()
         })
-    }
-    
-    /// Создание результата игры
-    func createResults() -> QuizResultsViewModel {
-        statisticService.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
-        
-        let text =
-                    """
-                    Ваш результат: \(presenter.correctAnswers)/\(presenter.questionsAmount)
-                    Количество сыгранных квизов: \(statisticService.gamesCount)
-                    Рекорд: \(statisticService.bestGame.correct)/\(presenter.questionsAmount) (\(statisticService.bestGame.date.dateTimeString))
-                    Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
-                    """
-        
-        let viewModel = QuizResultsViewModel(
-            title: "Этот раунд окончен!",
-            text: text,
-            buttonText: "Сыграть ещё раз")
-        
-        return viewModel
-    }
-    
-    /// Конвертация QuizResultsViewModel в AlertModel
-    /// - Parameter model: Вью модель результата квиза
-    /// - Returns: Модель алерты
-    func convertResultToAlert(model: QuizResultsViewModel) -> AlertModel {
-        let alertModel = AlertModel(
-            title: model.title,
-            message: model.text,
-            buttonText: model.buttonText
-        )
-        return alertModel
     }
 }
