@@ -7,7 +7,19 @@
 
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+protocol MovieQuizViewControllerProtocol: AnyObject {
+    func showQuestion(quiz step: QuizStepViewModel)
+    func showAnswer(with answer: Bool)
+    
+    func showLoadingIndicator()
+    func hideLoadingIndicator()
+    
+    func showResults(quiz result: QuizResultsViewModel)
+    func showNetworkError(message: String)
+    func showQuestionsAlert()
+}
+
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     // MARK: - IBOutlets
     @IBOutlet
@@ -49,7 +61,7 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
         
         resetAnswer()
-        hideSpinner()
+        hideLoadingIndicator()
     }
     
     /// Изменение цвета рамки постера в зависимости от ответа.
@@ -67,14 +79,14 @@ final class MovieQuizViewController: UIViewController {
     }
     
     /// Вывод индикатора загрузки
-    func showSpinner() {
+    func showLoadingIndicator() {
         activityIndicator.startAnimating()
         loadingView.isHidden = false
         view.isUserInteractionEnabled = false
     }
     
     /// Скрытие индикатора загрузки
-    func hideSpinner() {
+    func hideLoadingIndicator() {
         activityIndicator.stopAnimating()
         loadingView.isHidden = true
         view.isUserInteractionEnabled = true
@@ -116,10 +128,9 @@ extension MovieQuizViewController {
     /// Вывод результата игры
     ///
     /// Вывод результата игры и статистики всех игр с задержкой в 1 секунду
-    func showResults() {
+    func showResults(quiz result: QuizResultsViewModel) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
             guard let self = self else { return }
-            let result = presenter.createResults()
             let model = presenter.convertResultToAlert(model: result)
             AlertPresenter.resultAlert(on: self, with: model, completion: { [weak self] in
                 self?.presenter.restartQuiz()

@@ -10,18 +10,18 @@ import UIKit
 final class MovieQuizPresenter {
     var currentQuestion: QuizQuestion?
     
-    private let statisticService: StatisticServiceProtocol
+    private let statisticService: StatisticService!
     private var questionFactory: QuestionFactoryProtocol?
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     
     private let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
-        self.statisticService = StatisticService()
+        statisticService = StatisticService()
         
         loadQuiz()
     }
@@ -29,7 +29,7 @@ final class MovieQuizPresenter {
     func loadQuiz() {
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(networkClient: NetworkClient()), delegate: self)
         questionFactory?.loadData()
-        viewController?.showSpinner()
+        viewController?.showLoadingIndicator()
     }
     
     
@@ -70,7 +70,7 @@ final class MovieQuizPresenter {
     func restartQuiz() {
         resetQuestionIndex()
         correctAnswers = 0
-        viewController?.showSpinner()
+        viewController?.showLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
     
@@ -81,7 +81,8 @@ final class MovieQuizPresenter {
         viewController?.showAnswer(with: givenAnswer)
         
         if isLastQuestion() {
-            viewController?.showResults()
+            let results = createResults()
+            viewController?.showResults(quiz: results)
         } else {
             updateQuestionIndex()
             proceedToNextQuestion()
@@ -90,7 +91,7 @@ final class MovieQuizPresenter {
     
     /// Вывод следующего вопроса с задержкой в 1 секунду
     func proceedToNextQuestion() {
-        viewController?.showSpinner()
+        viewController?.showLoadingIndicator()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.questionFactory?.requestNextQuestion()
         }
@@ -142,7 +143,7 @@ extension MovieQuizPresenter: QuestionFactoryDelegate {
     /// - Parameter error: Описание ошибки
     func didFailToLoadData(with error: Error) {
         let message = error.localizedDescription
-        viewController?.hideSpinner()
+        viewController?.hideLoadingIndicator()
         viewController?.showNetworkError(message: message)
     }
     
@@ -161,7 +162,7 @@ extension MovieQuizPresenter: QuestionFactoryDelegate {
     
     /// Cообщение об ошибке при получении вопроса
     func didFailToReceiveNextQuestion() {
-        viewController?.hideSpinner()
+        viewController?.hideLoadingIndicator()
         viewController?.showQuestionsAlert()
     }
 }
