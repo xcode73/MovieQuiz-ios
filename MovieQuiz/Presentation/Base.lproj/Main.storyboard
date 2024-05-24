@@ -125,6 +125,9 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="do2-ae-4iU">
                                 <rect key="frame" x="157" y="398" width="100" height="100"/>
                                 <color key="backgroundColor" systemColor="tertiarySystemBackgroundColor"/>
+                                <accessibility key="accessibilityConfiguration" identifier="LoadingView">
+                                    <bool key="isElement" value="YES"/>
+                                </accessibility>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="100" id="DnR-kI-cLE"/>
                                     <constraint firstAttribute="width" constant="100" id="Fmq-sV-XSZ"/>

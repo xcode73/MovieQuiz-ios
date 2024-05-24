@@ -15,6 +15,7 @@ final class MovieQuizUITests: XCTestCase {
         try super.setUpWithError()
         
         app = XCUIApplication()
+        app.launchArguments = ["testing"]
         app.launch()
         
         continueAfterFailure = false
@@ -27,7 +28,7 @@ final class MovieQuizUITests: XCTestCase {
         app = nil
     }
     
-    private func chooseSystemTheme() {
+    private func tapButtonOnThemeAlert() {
         if app.alerts["Theme alert"].exists {
             let themeAlert = app.alerts["Theme alert"]
             XCTAssert(themeAlert.waitForExistence(timeout: 2))
@@ -35,18 +36,34 @@ final class MovieQuizUITests: XCTestCase {
         }
     }
     
+    private func waitWhileLoading() {
+        let loadingView = app.otherElements["LoadingView"]
+        for _ in 1...10 {
+            if loadingView.exists {
+                sleep(1)
+            } else {
+                break
+            }
+        }
+    }
+    
     private func checkQuestionChange(button: String) {
-        chooseSystemTheme()
         
-        let firstPoster = app.images["Poster"]
-        XCTAssert(firstPoster.waitForExistence(timeout: 2))
-        let firstPosterData = firstPoster.screenshot().pngRepresentation
+        func screenshotToData() -> Data {
+            let poster = app.images["Poster"]
+            let data = poster.screenshot().pngRepresentation
+            return data
+        }
+        
+        tapButtonOnThemeAlert()
+        waitWhileLoading()
+        
+        let firstPosterData = screenshotToData()
         
         app.buttons[button].tap()
+        waitWhileLoading()
         
-        let secondPoster = app.images["Poster"]
-        XCTAssert(secondPoster.waitForExistence(timeout: 2))
-        let secondPosterData = secondPoster.screenshot().pngRepresentation
+        let secondPosterData = screenshotToData()
 
         let indexLabel = app.staticTexts["Index"]
        
@@ -55,12 +72,10 @@ final class MovieQuizUITests: XCTestCase {
         XCTAssertEqual(indexLabel.label, "2/10")
     }
     
-    func answerButtonNoTapTenTimes() {
+    func tapAnswerButtonNoTenTimes() {
         for _ in 1...10 {
-            let poster = app.images["Poster"]
-            XCTAssert(poster.waitForExistence(timeout: 2))
+            waitWhileLoading()
             app.buttons["No"].tap()
-            sleep(1)
         }
     }
     
@@ -73,12 +88,13 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testGameFinish() {
-        chooseSystemTheme()
-        
-        answerButtonNoTapTenTimes()
+        tapButtonOnThemeAlert()
+        waitWhileLoading()
+        tapAnswerButtonNoTenTimes()
 
         let alert = app.alerts["Game results"]
-        XCTAssert(alert.waitForExistence(timeout: 2))
+        // alert appears only in 0.8 seconds so don't remove sleep
+        sleep(1)
         
         XCTAssertTrue(alert.exists)
         XCTAssertTrue(alert.label == "Этот раунд окончен!")
@@ -86,13 +102,15 @@ final class MovieQuizUITests: XCTestCase {
     }
 
     func testAlertDismiss() {
-        chooseSystemTheme()
-        
-        answerButtonNoTapTenTimes()
+        tapButtonOnThemeAlert()
+        waitWhileLoading()
+        tapAnswerButtonNoTenTimes()
         
         let alert = app.alerts["Game results"]
+        // alert appears only in 0.8 seconds so don't remove sleep
+        sleep(1)
         alert.buttons["button"].firstMatch.tap()
-        sleep(2)
+        waitWhileLoading()
         
         let indexLabel = app.staticTexts["Index"]
         
