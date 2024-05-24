@@ -42,6 +42,7 @@ final class MovieQuizUITests: XCTestCase {
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
         
+        sleep(1)
         app.buttons["Yes"].tap()
         sleep(3)
         
@@ -60,6 +61,7 @@ final class MovieQuizUITests: XCTestCase {
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
         
+        sleep(1)
         app.buttons["No"].tap()
         sleep(3)
         
@@ -76,6 +78,7 @@ final class MovieQuizUITests: XCTestCase {
         chooseSystemTheme()
         
         for _ in 1...10 {
+            sleep(1)
             app.buttons["No"].tap()
             sleep(3)
         }
@@ -91,11 +94,13 @@ final class MovieQuizUITests: XCTestCase {
         chooseSystemTheme()
         
         for _ in 1...10 {
+            sleep(1)
             app.buttons["No"].tap()
             sleep(4)
         }
         
         let alert = app.alerts["Game results"]
+        sleep(1)
         alert.buttons.firstMatch.tap()
         sleep(2)
         
