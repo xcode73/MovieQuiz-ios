@@ -57,6 +57,8 @@ struct AlertPresenter {
                                       message: message,
                                       preferredStyle: .alert)
         
+        alert.view.subviews.first?.subviews.first?.subviews.first?.backgroundColor = .systemBackground
+        
         alert.view.accessibilityIdentifier = identifier
         
         for button in buttons {

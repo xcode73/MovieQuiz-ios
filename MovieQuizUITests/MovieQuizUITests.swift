@@ -68,7 +68,7 @@ final class MovieQuizUITests: XCTestCase {
         sleep(2)
         for _ in 1...10 {
             app.buttons["No"].tap()
-            sleep(2)
+            sleep(3)
         }
 
         let alert = app.alerts["Game results"]
@@ -82,14 +82,13 @@ final class MovieQuizUITests: XCTestCase {
         sleep(2)
         for _ in 1...10 {
             app.buttons["No"].tap()
-            sleep(2)
+            sleep(3)
         }
         
         let alert = app.alerts["Game results"]
-        sleep(1)
         alert.buttons.firstMatch.tap()
         
-        sleep(2)
+        sleep(3)
         
         let indexLabel = app.staticTexts["Index"]
         print("INDEX = \(indexLabel.label)")
