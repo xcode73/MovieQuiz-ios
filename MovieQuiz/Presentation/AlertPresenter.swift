@@ -77,6 +77,7 @@ struct AlertPresenter {
                 let action = UIAlertAction(title: button, style: .default) { _ in
                     completion()
                 }
+                action.accessibilityIdentifier = "button"
                 alert.addAction(action)
             }
         }

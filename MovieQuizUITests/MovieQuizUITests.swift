@@ -30,60 +30,55 @@ final class MovieQuizUITests: XCTestCase {
     private func chooseSystemTheme() {
         if app.alerts["Theme alert"].exists {
             let themeAlert = app.alerts["Theme alert"]
-            sleep(1)
+            XCTAssert(themeAlert.waitForExistence(timeout: 2))
             themeAlert.buttons["Yes"].tap()
         }
-        sleep(2)
+    }
+    
+    private func checkQuestionChange(button: String) {
+        chooseSystemTheme()
+        
+        let firstPoster = app.images["Poster"]
+        XCTAssert(firstPoster.waitForExistence(timeout: 2))
+        let firstPosterData = firstPoster.screenshot().pngRepresentation
+        
+        app.buttons[button].tap()
+        
+        let secondPoster = app.images["Poster"]
+        XCTAssert(secondPoster.waitForExistence(timeout: 2))
+        let secondPosterData = secondPoster.screenshot().pngRepresentation
+
+        let indexLabel = app.staticTexts["Index"]
+       
+        XCTAssertNotEqual(firstPosterData, secondPosterData)
+        XCTAssert(indexLabel.waitForExistence(timeout: 2))
+        XCTAssertEqual(indexLabel.label, "2/10")
+    }
+    
+    func answerButtonNoTapTenTimes() {
+        for _ in 1...10 {
+            let poster = app.images["Poster"]
+            XCTAssert(poster.waitForExistence(timeout: 2))
+            app.buttons["No"].tap()
+            sleep(1)
+        }
     }
     
     func testYesButton() {
-        chooseSystemTheme()
-        
-        let firstPoster = app.images["Poster"]
-        let firstPosterData = firstPoster.screenshot().pngRepresentation
-        
-        sleep(1)
-        app.buttons["Yes"].tap()
-        sleep(3)
-        
-        let secondPoster = app.images["Poster"]
-        let secondPosterData = secondPoster.screenshot().pngRepresentation
-
-        let indexLabel = app.staticTexts["Index"]
-       
-        XCTAssertNotEqual(firstPosterData, secondPosterData)
-        XCTAssertEqual(indexLabel.label, "2/10")
+        checkQuestionChange(button: "Yes")
     }
     
     func testNoButton() {
-        chooseSystemTheme()
-        
-        let firstPoster = app.images["Poster"]
-        let firstPosterData = firstPoster.screenshot().pngRepresentation
-        
-        sleep(1)
-        app.buttons["No"].tap()
-        sleep(3)
-        
-        let secondPoster = app.images["Poster"]
-        let secondPosterData = secondPoster.screenshot().pngRepresentation
-
-        let indexLabel = app.staticTexts["Index"]
-       
-        XCTAssertNotEqual(firstPosterData, secondPosterData)
-        XCTAssertEqual(indexLabel.label, "2/10")
+        checkQuestionChange(button: "No")
     }
     
     func testGameFinish() {
         chooseSystemTheme()
         
-        for _ in 1...10 {
-            sleep(1)
-            app.buttons["No"].tap()
-            sleep(3)
-        }
+        answerButtonNoTapTenTimes()
 
         let alert = app.alerts["Game results"]
+        XCTAssert(alert.waitForExistence(timeout: 2))
         
         XCTAssertTrue(alert.exists)
         XCTAssertTrue(alert.label == "Этот раунд окончен!")
@@ -93,15 +88,10 @@ final class MovieQuizUITests: XCTestCase {
     func testAlertDismiss() {
         chooseSystemTheme()
         
-        for _ in 1...10 {
-            sleep(1)
-            app.buttons["No"].tap()
-            sleep(4)
-        }
+        answerButtonNoTapTenTimes()
         
         let alert = app.alerts["Game results"]
-        sleep(1)
-        alert.buttons.firstMatch.tap()
+        alert.buttons["button"].firstMatch.tap()
         sleep(2)
         
         let indexLabel = app.staticTexts["Index"]
