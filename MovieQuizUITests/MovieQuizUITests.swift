@@ -28,14 +28,6 @@ final class MovieQuizUITests: XCTestCase {
         app = nil
     }
     
-    private func tapButtonOnThemeAlert() {
-        if app.alerts["Theme alert"].exists {
-            let themeAlert = app.alerts["Theme alert"]
-            XCTAssert(themeAlert.waitForExistence(timeout: 2))
-            themeAlert.buttons["Yes"].tap()
-        }
-    }
-    
     private func waitWhileLoading() {
         let loadingView = app.otherElements["LoadingView"]
         for _ in 1...10 {
@@ -55,7 +47,6 @@ final class MovieQuizUITests: XCTestCase {
             return data
         }
         
-        tapButtonOnThemeAlert()
         waitWhileLoading()
         
         let firstPosterData = screenshotToData()
@@ -88,7 +79,6 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testGameFinish() {
-        tapButtonOnThemeAlert()
         waitWhileLoading()
         tapAnswerButtonNoTenTimes()
 
@@ -102,7 +92,6 @@ final class MovieQuizUITests: XCTestCase {
     }
 
     func testAlertDismiss() {
-        tapButtonOnThemeAlert()
         waitWhileLoading()
         tapAnswerButtonNoTenTimes()
         

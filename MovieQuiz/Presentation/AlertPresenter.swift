@@ -28,15 +28,6 @@ struct AlertPresenter {
                        completion: completion)
     }
     
-    static func themeAlert(on vc: UIViewController, completion: @escaping () -> Void) {
-        showBasicAlert(on: vc,
-                       title: "Выбор темы",
-                       message: "Приложение рассчитано на использование темной темы. Изменить на системную?",
-                       buttons: ["Да", "Нет"],
-                       identifier: "Theme alert",
-                       completion: completion)
-    }
-    
     static func showQuestionNetworkError(on vc: UIViewController, completion: @escaping () -> Void) {
         showBasicAlert(on: vc,
                        title: "Ошибка",

@@ -48,7 +48,6 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         super.viewDidLoad()
         
         presenter = MovieQuizPresenter(viewController: self)
-        setDefaultTheme(style: .dark)
     }
     
     //MARK: - Private methods
@@ -92,21 +91,9 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         view.isUserInteractionEnabled = true
     }
     
-    private func setDefaultTheme(style: UIUserInterfaceStyle) {
-        if traitCollection.userInterfaceStyle == .light {
-            showThemeAlert()
-            overrideUserInterfaceStyle = style
-        }
-    }
-    
     /// Изменение цвета рамки постера на прозрачный
     private func resetAnswer() {
         imageView.layer.borderColor = UIColor.clear.cgColor
-    }
-    
-    /// Тема оформления по выбору системы
-    private func systemTheme() {
-        overrideUserInterfaceStyle = .unspecified
     }
     
     //MARK: - IBActions
@@ -150,13 +137,6 @@ extension MovieQuizViewController {
     func showQuestionsAlert() {
         AlertPresenter.showQuestionNetworkError(on: self, completion: { [weak self] in
             self?.presenter.proceedToNextQuestion()
-        })
-    }
-    
-    /// Вывод сообщения об изменении темы
-    func showThemeAlert() {
-        AlertPresenter.themeAlert(on: self, completion: { [weak self] in
-            self?.systemTheme()
         })
     }
 }
