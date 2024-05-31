@@ -28,6 +28,8 @@ final class MovieQuizUITests: XCTestCase {
         app = nil
     }
     
+    // MARK: - Private helpers
+    
     private func waitWhileLoading() {
         let loadingView = app.otherElements["LoadingView"]
         for _ in 1...10 {
@@ -63,12 +65,14 @@ final class MovieQuizUITests: XCTestCase {
         XCTAssertEqual(indexLabel.label, "2/10")
     }
     
-    func tapAnswerButtonNoTenTimes() {
+    func tapAnswerNoButtonTenTimes() {
         for _ in 1...10 {
             waitWhileLoading()
             app.buttons["No"].tap()
         }
     }
+    
+    // MARK: - Tests
     
     func testYesButton() {
         checkQuestionChange(button: "Yes")
@@ -80,7 +84,7 @@ final class MovieQuizUITests: XCTestCase {
     
     func testGameFinish() {
         waitWhileLoading()
-        tapAnswerButtonNoTenTimes()
+        tapAnswerNoButtonTenTimes()
 
         let alert = app.alerts["Game results"]
         // alert appears only in 0.8 seconds so don't remove sleep
@@ -93,12 +97,12 @@ final class MovieQuizUITests: XCTestCase {
 
     func testAlertDismiss() {
         waitWhileLoading()
-        tapAnswerButtonNoTenTimes()
+        tapAnswerNoButtonTenTimes()
         
         let alert = app.alerts["Game results"]
         // alert appears only in 0.8 seconds so don't remove sleep
         sleep(1)
-        alert.buttons["button"].firstMatch.tap()
+        alert.buttons.firstMatch.tap()
         waitWhileLoading()
         
         let indexLabel = app.staticTexts["Index"]

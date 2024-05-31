@@ -112,7 +112,7 @@ final class MovieQuizPresenter {
         let viewModel = QuizResultsViewModel(
             title: "Этот раунд окончен!",
             text: text,
-            buttonText: "Сыграть ещё раз")
+            buttons: ["Сыграть ещё раз"])
         
         return viewModel
     }
@@ -124,9 +124,39 @@ final class MovieQuizPresenter {
         let alertModel = AlertModel(
             title: model.title,
             message: model.text,
-            buttonText: model.buttonText
+            buttons: model.buttons,
+            identifier: "Game results",
+            completion: {
+                self.restartQuiz()
+            }
         )
         return alertModel
+    }
+    
+    func networkErrorAlertModel(message: String) -> AlertModel {
+        let alertModel = AlertModel(
+            title: "Ошибка",
+            message: message,
+            buttons: ["Попробовать снова"],
+            identifier: "Network error",
+            completion: {
+                self.loadQuiz()
+            }
+        )
+        return alertModel
+    }
+    
+    func questionErrorModel() -> AlertModel {
+        let model = AlertModel(
+            title: "Ошибка",
+            message: "Не удалось загрузить вопрос! \n Проверьте подключение к сети",
+            buttons: ["Попробовать снова"],
+            identifier: "Question error",
+            completion: {
+                self.proceedToNextQuestion()
+            }
+        )
+        return model
     }
 }
 
@@ -141,10 +171,10 @@ extension MovieQuizPresenter: QuestionFactoryDelegate {
     
     /// Cообщение об ошибке загрузки игры
     /// - Parameter error: Описание ошибки
-    func didFailToLoadData(with error: Error) {
-        let message = error.localizedDescription
+    func didFailToLoadData(with error: Error?, errorMessage: String?) {
+//        let message = error?.localizedDescription
         viewController?.hideLoadingIndicator()
-        viewController?.showNetworkError(message: message)
+        viewController?.showNetworkError(message: errorMessage ?? "Неизвестная ошибка")
     }
     
     /// Сообщение об получении следующего вопроса

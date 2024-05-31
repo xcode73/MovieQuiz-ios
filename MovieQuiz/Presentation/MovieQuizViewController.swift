@@ -112,31 +112,28 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
 // MARK: - Alerts
 extension MovieQuizViewController {
     
-    /// Вывод результата игры
+    /// Вывод алерты с результатом игры
+    /// - Parameter result: Результат
     ///
-    /// Вывод результата игры и статистики всех игр с задержкой в 1 секунду
+    /// Вывод результата игры и статистики всех игр с задержкой в 0.8 секунду
     func showResults(quiz result: QuizResultsViewModel) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
             guard let self = self else { return }
             let model = presenter.convertResultToAlert(model: result)
-            AlertPresenter.resultAlert(on: self, with: model, completion: { [weak self] in
-                self?.presenter.restartQuiz()
-            })
+            AlertPresenter.showAlert(on: self, model: model)
         }
     }
     
     /// Вывод сообщения о проблемах с сетью
     /// - Parameter message: Описание ошибки
     func showNetworkError(message: String) {
-        AlertPresenter.networkErrorAlert(on: self, with: message, completion: { [weak self] in
-            self?.presenter.loadQuiz()
-        })
+        let model = presenter.networkErrorAlertModel(message: message)
+        AlertPresenter.showAlert(on: self, model: model)
     }
     
-    /// Вывод сообщения о проблемах с сетью
+    /// Вывод сообщения о проблемах с сетью при загрузке постера
     func showQuestionsAlert() {
-        AlertPresenter.showQuestionNetworkError(on: self, completion: { [weak self] in
-            self?.presenter.proceedToNextQuestion()
-        })
+        let model = presenter.questionErrorModel()
+        AlertPresenter.showAlert(on: self, model: model)
     }
 }
