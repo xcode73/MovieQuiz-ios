@@ -9,61 +9,36 @@ import UIKit
 
 struct AlertPresenter {
     
-    static func resultAlert(on vc: UIViewController, with model: AlertModel?) {
-        guard let model = model else { return }
+    static func showAlert(on vc: UIViewController, model: AlertModel) {
         showBasicAlert(on: vc,
                        title: model.title,
                        message: model.message,
-                       buttons: [model.buttonText],
+                       buttons: model.buttons,
+                       identifier: model.identifier,
                        completion: model.completion)
     }
     
-    static func networkErrorAlert(on vc: UIViewController, with message: String, completion: @escaping () -> Void) {
-        showBasicAlert(on: vc,
-                       title: "Ошибка",
-                       message: message,
-                       buttons: ["Попробовать еще раз"],
-                       completion: completion)
-    }
-    
-    static func themeAlert(on vc: UIViewController, completion: @escaping () -> Void) {
-        showBasicAlert(on: vc,
-                       title: "Выбор темы",
-                       message: "Приложение рассчитано на использование темной темы. Изменить на системную?",
-                       buttons: ["Да", "Нет"],
-                       completion: completion)
-    }
-    
-    static func showQuestionNetworkError(on vc: UIViewController, completion: @escaping () -> Void) {
-        showBasicAlert(on: vc,
-                       title: "Ошибка",
-                       message: "Не удалось загрузить вопрос! \n Проверьте подключение к сети",
-                       buttons: ["Попробовать снова"],
-                       completion: completion)
-    }
-    
-    private static func showBasicAlert(on vc: UIViewController, title: String, message: String, buttons: [String], completion: @escaping () -> ()) {
+    private static func showBasicAlert(on vc: UIViewController, 
+                                       title: String,
+                                       message: String,
+                                       buttons: [String],
+                                       identifier: String,
+                                       completion: @escaping () -> ()) {
         
         let alert = UIAlertController(title: title,
                                       message: message,
                                       preferredStyle: .alert)
         
+        alert.view.subviews.first?.subviews.first?.subviews.first?.backgroundColor = .systemBackground
+        
+        alert.view.accessibilityIdentifier = identifier
+        
         for button in buttons {
-            switch button {
-            case "Да":
-                let systemThemeAction = UIAlertAction(title: button, style: .default) { _ in
-                    completion()
-                }
-                alert.addAction(systemThemeAction)
-            case "Нет":
-                let defaultThemeAction = UIAlertAction(title: button, style: .cancel)
-                alert.addAction(defaultThemeAction)
-            default:
-                let action = UIAlertAction(title: button, style: .default) { _ in
-                    completion()
-                }
-                alert.addAction(action)
+            let action = UIAlertAction(title: button, style: .default) { _ in
+                completion()
             }
+            action.accessibilityIdentifier = button
+            alert.addAction(action)
         }
         
         DispatchQueue.main.async {

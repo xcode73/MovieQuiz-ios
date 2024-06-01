@@ -11,7 +11,7 @@ import Foundation
 struct AlertModel {
     let title: String
     let message: String
-    let buttonText: String
-    /// вызывается при нажатии на кнопку
+    let buttons: [String]
+    let identifier: String
     let completion: () -> Void
 }
