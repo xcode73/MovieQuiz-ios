@@ -8,6 +8,5 @@
 import Foundation
 
 struct APIKey {
-    // k_zcuw1ytf
     static let tvApiKey = "k_zcuw1ytf"
 }
