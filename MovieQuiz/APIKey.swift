@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Free key for TV API
 struct APIKey {
     static let tvApiKey = "k_zcuw1ytf"
 }
