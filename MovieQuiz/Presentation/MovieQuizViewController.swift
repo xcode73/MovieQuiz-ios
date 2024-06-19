@@ -69,11 +69,10 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         let color: CGColor?
         
         if answer == presenter.currentQuestion?.correctAnswer {
-            color = UIColor.ypGreen.cgColor
+            color = UIColor(named: "YP Green")?.cgColor
         } else {
-            color = UIColor.ypRed.cgColor
+            color = UIColor(named: "YP Red")?.cgColor
         }
-        
         imageView.layer.borderColor = color
     }
     
@@ -136,4 +135,12 @@ extension MovieQuizViewController {
         let model = presenter.questionErrorModel()
         AlertPresenter.showAlert(on: self, model: model)
     }
+}
+
+// MARK: - Preview
+@available(iOS 17, *)
+#Preview() {
+    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+    let viewController = storyboard.instantiateViewController(withIdentifier: "MovieQuizVC") as! MovieQuizViewController
+    return viewController
 }
